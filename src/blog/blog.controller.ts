@@ -13,25 +13,30 @@ import {
 } from '@nestjs/common';
 import type { ResponseType } from '../type/common.type';
 import { BlogService } from './blog.service';
-import { Blog, blogDto, updateBlogDto } from './dto/blog.dto';
+import { blogDto, updateBlogDto } from './dto/blog.dto';
+import { BlogEntity } from './entity/blog.entity';
 
 @Controller('blog')
 export class BlogController {
   constructor(private readonly blogService: BlogService) {}
 
   @Get()
-  getBlogs(@Query('search') search?: string): ResponseType<Blog[]> {
+  getBlogs(
+    @Query('search') search?: string,
+  ): Promise<ResponseType<BlogEntity[]>> {
     return this.blogService.getBlogs(search);
   }
 
   @Get(':id')
-  getSingleBlog(@Param('id', ParseIntPipe) id: number): ResponseType<Blog> {
+  getSingleBlog(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ResponseType<BlogEntity>> {
     return this.blogService.getSingleBlog(id);
   }
 
   @Post('/create')
   @HttpCode(HttpStatus.CREATED)
-  createBlog(@Body() blog: blogDto): ResponseType<Blog> {
+  createBlog(@Body() blog: blogDto): Promise<ResponseType<BlogEntity>> {
     return this.blogService.createBlog(blog);
   }
 
@@ -39,12 +44,14 @@ export class BlogController {
   updateBlog(
     @Param('id', ParseIntPipe) id: number,
     @Body() blog: updateBlogDto,
-  ): ResponseType<Blog> {
+  ): Promise<ResponseType<BlogEntity>> {
     return this.blogService.updateBlog(id, blog);
   }
 
   @Delete('/delete/:id')
-  deleteBlog(@Param('id', ParseIntPipe) id: number): ResponseType<Blog> {
+  deleteBlog(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ResponseType<BlogEntity>> {
     return this.blogService.deleteBlog(id);
   }
 }

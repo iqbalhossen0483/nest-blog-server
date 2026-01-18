@@ -39,10 +39,6 @@ export class updateBlogDto {
   description?: string;
 }
 
-export interface Blog extends blogDto {
-  id: number;
-}
-
 export class commentDto {
   @IsNotEmpty({ message: 'Text is required' })
   @IsString({ message: 'Text must be a string' })
