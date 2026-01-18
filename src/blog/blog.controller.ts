@@ -38,6 +38,14 @@ export class BlogController {
     return this.blogService.createBlog(blog);
   }
 
+  @Post('/create-multiple')
+  @HttpCode(HttpStatus.CREATED)
+  createMultipleBlogs(
+    @Body() blogs: blogDto[],
+  ): Promise<ResponseType<BlogEntity[]>> {
+    return this.blogService.createMultipleBlogs(blogs);
+  }
+
   @Put('/update/:id')
   updateBlog(
     @Param('id', ParseIntPipe) id: number,

@@ -74,6 +74,18 @@ export class BlogService {
       data: newBlog,
     };
   }
+
+  async createMultipleBlogs(
+    payload: blogDto[],
+  ): Promise<ResponseType<BlogEntity[]>> {
+    const newBlogs = await this.blogRepo.save(payload);
+    return {
+      success: true,
+      message: 'Blogs created successfully',
+      data: newBlogs,
+    };
+  }
+
   async updateBlog(
     id: number,
     payload: updateBlogDto,
