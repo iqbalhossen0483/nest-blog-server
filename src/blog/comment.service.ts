@@ -15,6 +15,13 @@ export class CommentService {
   async createComment(
     payload: commentDto,
   ): Promise<ResponseType<CommentEntity>> {
+    const blog = await this.commentRepo.findOne({
+      where: { id: payload.blogId },
+    });
+    if (!blog) {
+      throw new NotFoundException("Blog doesn't exist");
+    }
+
     const newComment = await this.commentRepo.save(payload);
     return {
       success: true,
