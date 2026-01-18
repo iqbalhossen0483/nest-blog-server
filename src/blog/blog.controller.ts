@@ -60,4 +60,11 @@ export class BlogController {
   ): Promise<ResponseType<null>> {
     return this.blogService.deleteBlog(id);
   }
+
+  @Post('/restore/:id')
+  restoreBlog(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ResponseType<null>> {
+    return this.blogService.restoreBlog(id);
+  }
 }

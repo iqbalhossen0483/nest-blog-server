@@ -118,4 +118,22 @@ export class BlogService {
       data: null,
     };
   }
+
+  async restoreBlog(id: number): Promise<ResponseType<null>> {
+    const blogToRestore = await this.blogRepo.findOne({
+      where: { id },
+      withDeleted: true,
+    });
+    if (!blogToRestore) {
+      throw new NotFoundException("Blog doesn't exist");
+    }
+
+    await this.blogRepo.restore(id);
+
+    return {
+      success: true,
+      message: 'Blog restored successfully',
+      data: null,
+    };
+  }
 }
