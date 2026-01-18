@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindManyOptions, Like, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ResponseType } from '../type/common.type';
 import { blogDto, updateBlogDto } from './dto/blog.dto';
 import { BlogEntity } from './entity/blog.entity';
@@ -18,33 +18,19 @@ export class BlogService {
   ): Promise<ResponseType<BlogEntity[]>> {
     const skip = (page - 1) * limit;
 
-    const query: FindManyOptions<BlogEntity> = {
-      order: { createdAt: 'DESC' },
-      skip: skip,
-      take: limit,
-      relations: ['comments'],
-    };
+    const queryBuilder = this.blogRepo
+      .createQueryBuilder('blog')
+      .loadRelationCountAndMap('blog.commentCount', 'blog.comments')
+      .orderBy('blog.createdAt', 'DESC')
+      .skip(skip)
+      .take(limit);
 
     if (search) {
-      query.where = { title: Like(`%${search}%`) };
-
-      const count = await this.blogRepo.count(query);
-      const blogs = await this.blogRepo.find(query);
-      return {
-        success: true,
-        message: 'Blogs found',
-        data: blogs,
-        meta: {
-          total: count,
-          page,
-          last_page: Math.ceil(count / limit),
-        },
-      };
+      queryBuilder.where('blog.title LIKE :search', { search: `%${search}%` });
     }
 
-    const count = await this.blogRepo.count();
+    const [blogs, count] = await queryBuilder.getManyAndCount();
 
-    const blogs = await this.blogRepo.find(query);
     return {
       success: true,
       message: 'Blogs found',
