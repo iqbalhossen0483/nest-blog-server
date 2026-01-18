@@ -38,8 +38,8 @@ export class BlogService {
       data: blog,
     };
   }
-  async createBlog(blog: blogDto): Promise<ResponseType<BlogEntity>> {
-    const newBlog = await this.blogRepo.save(blog);
+  async createBlog(payload: blogDto): Promise<ResponseType<BlogEntity>> {
+    const newBlog = await this.blogRepo.save(payload);
     return {
       success: true,
       message: 'Blog created successfully',
@@ -48,33 +48,33 @@ export class BlogService {
   }
   async updateBlog(
     id: number,
-    blog: updateBlogDto,
-  ): Promise<ResponseType<BlogEntity>> {
+    payload: updateBlogDto,
+  ): Promise<ResponseType<null>> {
     const blogToUpdate = await this.blogRepo.findOne({ where: { id } });
     if (!blogToUpdate) {
       throw new NotFoundException("Blog doesn't exist");
     }
 
-    await this.blogRepo.update(id, blog);
+    await this.blogRepo.update(id, payload);
 
     return {
       success: true,
       message: 'Blog updated successfully',
-      data: blogToUpdate,
+      data: null,
     };
   }
-  async deleteBlog(id: number): Promise<ResponseType<BlogEntity>> {
+  async deleteBlog(id: number): Promise<ResponseType<null>> {
     const blogToDelete = await this.blogRepo.findOne({ where: { id } });
     if (!blogToDelete) {
       throw new NotFoundException("Blog doesn't exist");
     }
 
-    await this.blogRepo.upsert({ id, deletedAt: new Date() }, ['id']);
+    await this.blogRepo.softDelete(id);
 
     return {
       success: true,
       message: 'Blog deleted successfully',
-      data: blogToDelete,
+      data: null,
     };
   }
 }

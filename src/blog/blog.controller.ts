@@ -44,14 +44,14 @@ export class BlogController {
   updateBlog(
     @Param('id', ParseIntPipe) id: number,
     @Body() blog: updateBlogDto,
-  ): Promise<ResponseType<BlogEntity>> {
+  ): Promise<ResponseType<null>> {
     return this.blogService.updateBlog(id, blog);
   }
 
   @Delete('/delete/:id')
   deleteBlog(
     @Param('id', ParseIntPipe) id: number,
-  ): Promise<ResponseType<BlogEntity>> {
+  ): Promise<ResponseType<null>> {
     return this.blogService.deleteBlog(id);
   }
 }

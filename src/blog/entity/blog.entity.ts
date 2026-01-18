@@ -16,13 +16,40 @@ export class BlogEntity {
   title: string;
 
   @Column({ length: 1000 })
-  dscription: string;
+  description: string;
 
   @Column({ nullable: false, type: 'int' })
-  athor: number;
+  author: number;
 
-  @Column({ type: 'int', default: 0 })
+  @Column('int', { default: 0 })
   views: number;
+
+  @Column('int', { array: true, default: [] })
+  likes: number[];
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
+}
+
+@Entity('comments')
+export class CommentEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ length: 1000 })
+  text: string;
+
+  @Column({ nullable: false, type: 'int' })
+  author: number;
+
+  @Column({ nullable: false, type: 'int' })
+  blogId: number;
 
   @CreateDateColumn()
   createdAt: Date;
