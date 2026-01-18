@@ -3,30 +3,35 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ResponseType } from '../type/common.type';
 import { commentDto } from './dto/blog.dto';
-import { CommentEntity } from './entity/blog.entity';
+import { BlogEntity, CommentEntity } from './entity/blog.entity';
 
 @Injectable()
 export class CommentService {
   constructor(
     @InjectRepository(CommentEntity)
     private commentRepo: Repository<CommentEntity>,
+    @InjectRepository(BlogEntity)
+    private blogRepo: Repository<BlogEntity>,
   ) {}
 
   async createComment(
     payload: commentDto,
-  ): Promise<ResponseType<CommentEntity>> {
-    const blog = await this.commentRepo.findOne({
+  ): Promise<ResponseType<{ id: number }>> {
+    const blog = await this.blogRepo.findOne({
       where: { id: payload.blogId },
     });
     if (!blog) {
       throw new NotFoundException("Blog doesn't exist");
     }
 
-    const newComment = await this.commentRepo.save(payload);
+    const newBlog = await this.commentRepo.save({
+      ...payload,
+      blog,
+    });
     return {
       success: true,
       message: 'Comment created successfully',
-      data: newComment,
+      data: { id: newBlog.id },
     };
   }
 
@@ -39,7 +44,7 @@ export class CommentService {
       throw new NotFoundException("Comment doesn't exist");
     }
 
-    await this.commentRepo.update(id, payload);
+    await this.commentRepo.update(id, { text: payload.text });
 
     return {
       success: true,
