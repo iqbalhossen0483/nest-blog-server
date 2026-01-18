@@ -57,7 +57,10 @@ export class BlogService {
     };
   }
   async getSingleBlog(id: number): Promise<ResponseType<BlogEntity>> {
-    const blog = await this.blogRepo.findOne({ where: { id } });
+    const blog = await this.blogRepo.findOne({
+      where: { id },
+      relations: ['comments'],
+    });
     if (!blog) {
       throw new NotFoundException("Blog doesn't exist");
     }
