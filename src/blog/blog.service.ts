@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ResponseType } from '../type/common.type';
-import { Blog, blogDto } from './dto/blog.dto';
+import { Blog, blogDto, updateBlogDto } from './dto/blog.dto';
 
 @Injectable()
 export class BlogService {
@@ -56,14 +56,15 @@ export class BlogService {
       data: newBlog,
     };
   }
-  updateBlog(id: number, blog: blogDto): ResponseType<Blog> {
+  updateBlog(id: number, blog: updateBlogDto): ResponseType<Blog> {
     const blogToUpdate = this.blogs.find((blog) => blog.id === id);
     if (!blogToUpdate) {
       throw new NotFoundException("Blog doesn't exist");
     }
-    blogToUpdate.title = blog.title;
-    blogToUpdate.description = blog.description;
-    blogToUpdate.author = blog.author;
+
+    if (blog.title) blogToUpdate.title = blog.title;
+    if (blog.description) blogToUpdate.description = blog.description;
+
     return {
       success: true,
       message: 'Blog updated successfully',

@@ -25,6 +25,19 @@ export class blogDto {
   @IsNumber({ allowNaN: false }, { message: 'Author must be a number' })
   author: number;
 }
+export class updateBlogDto {
+  @IsString({ message: 'Title must be a string' })
+  @MinLength(3, { message: 'Title must be at least 3 characters long' })
+  @MaxLength(50, { message: 'Title must be at most 50 characters long' })
+  title?: string;
+
+  @IsString({ message: 'Description must be a string' })
+  @MinLength(3, { message: 'Description must be at least 3 characters long' })
+  @MaxLength(1000, {
+    message: 'Description must be at most 1000 characters long',
+  })
+  description?: string;
+}
 
 export interface Blog extends blogDto {
   id: number;

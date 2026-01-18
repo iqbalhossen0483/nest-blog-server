@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -8,17 +9,18 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import type { ResponseType } from '../type/common.type';
 import { BlogService } from './blog.service';
-import { Blog, blogDto } from './dto/blog.dto';
+import { Blog, blogDto, updateBlogDto } from './dto/blog.dto';
 
 @Controller('blog')
 export class BlogController {
   constructor(private readonly blogService: BlogService) {}
 
   @Get()
-  getBlogs(@Param('search') search?: string): ResponseType<Blog[]> {
+  getBlogs(@Query('search') search?: string): ResponseType<Blog[]> {
     return this.blogService.getBlogs(search);
   }
 
@@ -29,14 +31,14 @@ export class BlogController {
 
   @Post('/create')
   @HttpCode(HttpStatus.CREATED)
-  createBlog(blog: blogDto): ResponseType<Blog> {
+  createBlog(@Body() blog: blogDto): ResponseType<Blog> {
     return this.blogService.createBlog(blog);
   }
 
   @Put('/update/:id')
   updateBlog(
     @Param('id', ParseIntPipe) id: number,
-    blog: blogDto,
+    @Body() blog: updateBlogDto,
   ): ResponseType<Blog> {
     return this.blogService.updateBlog(id, blog);
   }
