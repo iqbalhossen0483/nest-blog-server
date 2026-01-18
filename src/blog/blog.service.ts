@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Like, Repository } from 'typeorm';
 import { ResponseType } from '../type/common.type';
 import { blogDto, updateBlogDto } from './dto/blog.dto';
 import { BlogEntity } from './entity/blog.entity';
@@ -11,20 +11,48 @@ export class BlogService {
     @InjectRepository(BlogEntity) private blogRepo: Repository<BlogEntity>,
   ) {}
 
-  async getBlogs(search?: string): Promise<ResponseType<BlogEntity[]>> {
+  async getBlogs(
+    search?: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<ResponseType<BlogEntity[]>> {
+    const skip = (page - 1) * limit;
+
+    const query: FindManyOptions<BlogEntity> = {
+      order: { createdAt: 'DESC' },
+      skip: skip,
+      take: limit,
+    };
+
     if (search) {
-      const blogs = await this.blogRepo.find({ where: { title: search } });
+      query.where = { title: Like(`%${search}%`) };
+
+      const count = await this.blogRepo.count(query);
+      const blogs = await this.blogRepo.find(query);
       return {
         success: true,
         message: 'Blogs found',
         data: blogs,
+        meta: {
+          total: count,
+          page,
+          last_page: Math.ceil(count / limit),
+        },
       };
     }
-    const blogs = await this.blogRepo.find();
+
+    const count = await this.blogRepo.count();
+
+    const blogs = await this.blogRepo.find(query);
     return {
       success: true,
       message: 'Blogs found',
       data: blogs,
+      meta: {
+        total: count,
+        page,
+        last_page: Math.ceil(count / limit),
+      },
     };
   }
   async getSingleBlog(id: number): Promise<ResponseType<BlogEntity>> {

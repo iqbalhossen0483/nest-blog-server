@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import type { ResponseType } from '../type/common.type';
 import { BlogService } from './blog.service';
-import { blogDto, updateBlogDto } from './dto/blog.dto';
+import { blogDto, BlogsQueryDto, updateBlogDto } from './dto/blog.dto';
 import { BlogEntity } from './entity/blog.entity';
 
 @Controller('blog')
@@ -21,10 +21,8 @@ export class BlogController {
   constructor(private readonly blogService: BlogService) {}
 
   @Get()
-  getBlogs(
-    @Query('search') search?: string,
-  ): Promise<ResponseType<BlogEntity[]>> {
-    return this.blogService.getBlogs(search);
+  getBlogs(@Query() query: BlogsQueryDto): Promise<ResponseType<BlogEntity[]>> {
+    return this.blogService.getBlogs(query.search, query.page, query.limit);
   }
 
   @Get(':id')

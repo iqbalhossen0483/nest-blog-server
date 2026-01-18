@@ -1,6 +1,9 @@
+import { Type } from 'class-transformer';
 import {
+  IsInt,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   MaxLength,
   MinLength,
@@ -55,4 +58,20 @@ export class commentDto {
   @IsNotEmpty({ message: 'Blog id is required' })
   @IsNumber({ allowNaN: false }, { message: 'Blog must be a number' })
   blogId: number;
+}
+
+export class BlogsQueryDto {
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  page?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  limit?: number;
 }
