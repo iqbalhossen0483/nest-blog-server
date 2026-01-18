@@ -22,6 +22,7 @@ export class BlogService {
       order: { createdAt: 'DESC' },
       skip: skip,
       take: limit,
+      relations: ['comments'],
     };
 
     if (search) {

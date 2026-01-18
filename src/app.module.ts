@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { BlogModule } from './blog/blog.module';
-import { BlogEntity } from './blog/entity/blog.entity';
+import { BlogEntity, CommentEntity } from './blog/entity/blog.entity';
 
 @Module({
   imports: [
@@ -14,7 +14,7 @@ import { BlogEntity } from './blog/entity/blog.entity';
       password: 'postgres',
       database: 'blog_server',
       synchronize: true,
-      entities: [BlogEntity],
+      entities: [BlogEntity, CommentEntity],
     }),
     BlogModule,
   ],

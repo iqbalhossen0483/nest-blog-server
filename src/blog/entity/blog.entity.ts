@@ -3,6 +3,9 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -27,6 +30,9 @@ export class BlogEntity {
   @Column('int', { array: true, default: [] })
   likes: number[];
 
+  @OneToMany(() => CommentEntity, (comment) => comment.blog)
+  comments: CommentEntity[];
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -48,8 +54,9 @@ export class CommentEntity {
   @Column({ nullable: false, type: 'int' })
   author: number;
 
-  @Column({ nullable: false, type: 'int' })
-  blogId: number;
+  @ManyToOne(() => BlogEntity, (blog) => blog.comments, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'blogId' })
+  blog: BlogEntity;
 
   @CreateDateColumn()
   createdAt: Date;
