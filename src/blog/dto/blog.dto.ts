@@ -6,7 +6,7 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class createBlogDto {
+export class blogDto {
   @IsNotEmpty({ message: 'Title is required' })
   @IsString({ message: 'Title must be a string' })
   @MinLength(3, { message: 'Title must be at least 3 characters long' })
@@ -26,7 +26,11 @@ export class createBlogDto {
   author: number;
 }
 
-export class createCommentDto {
+export interface Blog extends blogDto {
+  id: number;
+}
+
+export class commentDto {
   @IsNotEmpty({ message: 'Text is required' })
   @IsString({ message: 'Text must be a string' })
   @MinLength(3, { message: 'Text must be at least 3 characters long' })
