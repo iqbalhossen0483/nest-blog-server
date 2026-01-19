@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { BlogModule } from './blog/blog.module';
 import { BlogEntity, CommentEntity } from './blog/entity/blog.entity';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { BlogEntity, CommentEntity } from './blog/entity/blog.entity';
       entities: [BlogEntity, CommentEntity],
     }),
     BlogModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [],
