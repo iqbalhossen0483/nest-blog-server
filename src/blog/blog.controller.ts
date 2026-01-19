@@ -47,7 +47,7 @@ export class BlogController {
   @HttpCode(HttpStatus.CREATED)
   createMultipleBlogs(
     @Body() blogs: blogDto[],
-  ): Promise<ResponseType<BlogEntity[]>> {
+  ): Promise<ResponseType<Omit<BlogEntity, 'author'>[]>> {
     return this.blogService.createMultipleBlogs(blogs);
   }
 

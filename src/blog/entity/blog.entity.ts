@@ -1,3 +1,4 @@
+import { UserEntity } from 'src/auth/entity/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -21,8 +22,9 @@ export class BlogEntity {
   @Column({ length: 1000 })
   description: string;
 
-  @Column({ nullable: false, type: 'int' })
-  author: number;
+  @ManyToOne(() => UserEntity, (user) => user.blogs)
+  @JoinColumn({ name: 'author' })
+  author: UserEntity;
 
   @Column('int', { default: 0 })
   views: number;

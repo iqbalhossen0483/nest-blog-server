@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from 'src/auth/entity/user.entity';
 import { Repository } from 'typeorm';
 import { ResponseType } from '../type/common.type';
 import { blogDto, updateBlogDto } from './dto/blog.dto';
@@ -13,6 +14,7 @@ import { BlogEntity } from './entity/blog.entity';
 export class BlogService {
   constructor(
     @InjectRepository(BlogEntity) private blogRepo: Repository<BlogEntity>,
+    @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
   ) {}
 
   async getBlogs(
@@ -25,6 +27,7 @@ export class BlogService {
     const queryBuilder = this.blogRepo
       .createQueryBuilder('blog')
       .loadRelationCountAndMap('blog.commentCount', 'blog.comments')
+      .innerJoinAndSelect('blog.author', 'author')
       .orderBy('blog.createdAt', 'DESC')
       .skip(skip)
       .take(limit);
@@ -49,7 +52,7 @@ export class BlogService {
   async getSingleBlog(id: number): Promise<ResponseType<BlogEntity>> {
     const blog = await this.blogRepo.findOne({
       where: { id },
-      relations: ['comments'],
+      relations: ['comments', 'author'],
     });
     if (!blog) {
       throw new NotFoundException("Blog doesn't exist");
@@ -61,7 +64,18 @@ export class BlogService {
     };
   }
   async createBlog(payload: blogDto): Promise<ResponseType<BlogEntity>> {
-    const newBlog = await this.blogRepo.save(payload);
+    const author = await this.userRepo.findOne({
+      where: { id: payload.author },
+    });
+
+    if (!author) {
+      throw new NotFoundException("Author doesn't exist");
+    }
+
+    const newBlog = await this.blogRepo.save({
+      ...payload,
+      author,
+    });
     return {
       success: true,
       message: 'Blog created successfully',
@@ -71,8 +85,22 @@ export class BlogService {
 
   async createMultipleBlogs(
     payload: blogDto[],
-  ): Promise<ResponseType<BlogEntity[]>> {
-    const newBlogs = await this.blogRepo.save(payload);
+  ): Promise<ResponseType<Omit<BlogEntity, 'author'>[]>> {
+    const blogData = await Promise.all(
+      payload.map(async (blog) => {
+        const author = await this.userRepo.findOne({
+          where: { id: blog.author },
+        });
+        if (!author) {
+          throw new NotFoundException("Author doesn't exist");
+        }
+        return {
+          ...blog,
+          author,
+        };
+      }),
+    );
+    const newBlogs = await this.blogRepo.save(blogData);
     return {
       success: true,
       message: 'Blogs created successfully',
