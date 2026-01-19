@@ -20,12 +20,12 @@ import { BlogEntity } from './entity/blog.entity';
 export class BlogController {
   constructor(private readonly blogService: BlogService) {}
 
-  @Get()
+  @Get('/all')
   getBlogs(@Query() query: BlogsQueryDto): Promise<ResponseType<BlogEntity[]>> {
     return this.blogService.getBlogs(query.search, query.page, query.limit);
   }
 
-  @Get(':id')
+  @Get('/get-single/:id')
   getSingleBlog(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<ResponseType<BlogEntity>> {

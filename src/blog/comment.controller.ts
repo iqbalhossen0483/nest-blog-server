@@ -3,7 +3,7 @@ import { ResponseType } from '../type/common.type';
 import { CommentService } from './comment.service';
 import { commentDto } from './dto/blog.dto';
 
-@Controller('comment')
+@Controller('blog/comment')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
