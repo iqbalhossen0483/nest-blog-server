@@ -218,11 +218,11 @@ export class BlogService {
     if (!user) {
       throw new NotFoundException("User doesn't exist");
     }
-    if (blog.likes.includes(user)) {
+    if (blog.likes.some((user) => user.id === user.id)) {
       throw new ConflictException('You have already liked this blog');
     }
 
-    if (blog.dislikes.includes(user)) {
+    if (blog.dislikes.some((user) => user.id === user.id)) {
       blog.dislikes = blog.dislikes.filter(
         (dislikeUser) => dislikeUser !== user,
       );
@@ -238,7 +238,10 @@ export class BlogService {
   }
 
   async dislikeBlog(id: number, userId: number): Promise<ResponseType<null>> {
-    const blog = await this.blogRepo.findOne({ where: { id } });
+    const blog = await this.blogRepo.findOne({
+      where: { id },
+      relations: ['likes', 'dislikes'],
+    });
     if (!blog) {
       throw new NotFoundException("Blog doesn't exist");
     }
@@ -248,11 +251,11 @@ export class BlogService {
       throw new NotFoundException("User doesn't exist");
     }
 
-    if (blog.dislikes.includes(user)) {
+    if (blog.dislikes.some((user) => user.id === user.id)) {
       throw new ConflictException('You have already disliked this blog');
     }
 
-    if (blog.likes.includes(user)) {
+    if (blog.likes.some((user) => user.id === user.id)) {
       blog.likes = blog.likes.filter((likeUser) => likeUser !== user);
     }
     blog.dislikes.push(user);
