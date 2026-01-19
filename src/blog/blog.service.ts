@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/auth/entity/user.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { ResponseType } from '../type/common.type';
 import { blogDto, updateBlogDto } from './dto/blog.dto';
 import { BlogEntity } from './entity/blog.entity';
@@ -97,10 +97,19 @@ export class BlogService {
       throw new NotFoundException("Author doesn't exist");
     }
 
-    const newBlog = await this.blogRepo.save({
+    const insertedBlog = await this.blogRepo.save({
       ...payload,
       author,
     });
+
+    const newBlog = await this.blogRepo.findOne({
+      where: { id: insertedBlog.id },
+    });
+
+    if (!newBlog) {
+      throw new NotFoundException("Blog doesn't inserted");
+    }
+
     return {
       success: true,
       message: 'Blog created successfully',
@@ -125,7 +134,11 @@ export class BlogService {
         };
       }),
     );
-    const newBlogs = await this.blogRepo.save(blogData);
+    const insertedBlogs = await this.blogRepo.save(blogData);
+    const newBlogs = await this.blogRepo.find({
+      where: { id: In(insertedBlogs.map((blog) => blog.id)) },
+    });
+
     return {
       success: true,
       message: 'Blogs created successfully',
@@ -136,7 +149,7 @@ export class BlogService {
   async updateBlog(
     id: number,
     payload: updateBlogDto,
-  ): Promise<ResponseType<null>> {
+  ): Promise<ResponseType<BlogEntity>> {
     const blogToUpdate = await this.blogRepo.findOne({ where: { id } });
     if (!blogToUpdate) {
       throw new NotFoundException("Blog doesn't exist");
@@ -144,10 +157,15 @@ export class BlogService {
 
     await this.blogRepo.update(id, payload);
 
+    const blog = await this.blogRepo.findOne({ where: { id } });
+    if (!blog) {
+      throw new NotFoundException("Blog doesn't exist");
+    }
+
     return {
       success: true,
       message: 'Blog updated successfully',
-      data: null,
+      data: blog,
     };
   }
   async deleteBlog(id: number): Promise<ResponseType<null>> {
@@ -165,7 +183,7 @@ export class BlogService {
     };
   }
 
-  async restoreBlog(id: number): Promise<ResponseType<null>> {
+  async restoreBlog(id: number): Promise<ResponseType<BlogEntity>> {
     const blogToRestore = await this.blogRepo.findOne({
       where: { id },
       withDeleted: true,
@@ -176,10 +194,15 @@ export class BlogService {
 
     await this.blogRepo.restore(id);
 
+    const blog = await this.blogRepo.findOne({ where: { id } });
+    if (!blog) {
+      throw new NotFoundException("Blog doesn't exist");
+    }
+
     return {
       success: true,
       message: 'Blog restored successfully',
-      data: null,
+      data: blog,
     };
   }
 

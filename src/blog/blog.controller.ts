@@ -55,7 +55,7 @@ export class BlogController {
   updateBlog(
     @Param('id', ParseIntPipe) id: number,
     @Body() blog: updateBlogDto,
-  ): Promise<ResponseType<null>> {
+  ): Promise<ResponseType<BlogEntity>> {
     return this.blogService.updateBlog(id, blog);
   }
 
@@ -69,7 +69,7 @@ export class BlogController {
   @Post('/restore/:id')
   restoreBlog(
     @Param('id', ParseIntPipe) id: number,
-  ): Promise<ResponseType<null>> {
+  ): Promise<ResponseType<BlogEntity>> {
     return this.blogService.restoreBlog(id);
   }
 
