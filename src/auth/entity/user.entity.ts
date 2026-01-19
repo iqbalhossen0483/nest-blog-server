@@ -1,4 +1,3 @@
-import { BlogEntity, CommentEntity } from 'src/blog/entity/blog.entity';
 import {
   Column,
   CreateDateColumn,
@@ -9,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { BlogEntity, CommentEntity } from '../../blog/entity/blog.entity';
 
 export enum UserRole {
   USER = 'user',

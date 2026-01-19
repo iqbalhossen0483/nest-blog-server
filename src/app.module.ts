@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
@@ -18,6 +19,7 @@ import { BlogEntity, CommentEntity } from './blog/entity/blog.entity';
       synchronize: true,
       entities: [BlogEntity, CommentEntity, UserEntity],
     }),
+    ConfigModule.forRoot(),
     BlogModule,
     AuthModule,
   ],

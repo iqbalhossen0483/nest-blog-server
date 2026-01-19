@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { compareSync, genSaltSync, hashSync } from 'bcrypt-ts';
-import { ResponseType } from 'src/type/common.type';
 import { Repository } from 'typeorm';
+import { ResponseType } from '../type/common.type';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
 import { UserEntity } from './entity/user.entity';
 
