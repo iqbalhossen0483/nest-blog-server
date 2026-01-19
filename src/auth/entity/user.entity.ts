@@ -1,4 +1,4 @@
-import { BlogEntity } from 'src/blog/entity/blog.entity';
+import { BlogEntity, CommentEntity } from 'src/blog/entity/blog.entity';
 import {
   Column,
   CreateDateColumn,
@@ -41,6 +41,15 @@ export class UserEntity {
 
   @OneToMany(() => BlogEntity, (blog) => blog.author)
   blogs: BlogEntity[];
+
+  @OneToMany(() => BlogEntity, (blog) => blog.author)
+  comments: CommentEntity[];
+
+  @Column({ default: true })
+  isActive: boolean;
+
+  @Column({ default: false })
+  isVerified: boolean;
 
   @Column({ nullable: true, select: false })
   accessToken: string;

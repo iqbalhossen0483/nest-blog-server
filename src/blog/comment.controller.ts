@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Param, Post, Put } from '@nestjs/common';
 import { ResponseType } from '../type/common.type';
 import { CommentService } from './comment.service';
 import { commentDto } from './dto/blog.dto';
+import { CommentEntity } from './entity/blog.entity';
 
 @Controller('blog/comment')
 export class CommentController {
@@ -10,7 +11,7 @@ export class CommentController {
   @Post('create')
   async createComment(
     @Body() payload: commentDto,
-  ): Promise<ResponseType<{ id: number }>> {
+  ): Promise<ResponseType<CommentEntity>> {
     return await this.commentService.createComment(payload);
   }
 
@@ -18,7 +19,7 @@ export class CommentController {
   async updateComment(
     @Param('id') id: number,
     @Body() payload: commentDto,
-  ): Promise<ResponseType<null>> {
+  ): Promise<ResponseType<CommentEntity>> {
     return await this.commentService.updateComment(id, payload);
   }
 
