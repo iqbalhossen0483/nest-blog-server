@@ -88,4 +88,12 @@ export class BlogController {
   ): Promise<ResponseType<null>> {
     return this.blogService.dislikeBlog(id, payload.userId);
   }
+
+  @Post('/views/:id')
+  blogViews(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() payload: LikeDislikeBlogDto,
+  ): Promise<ResponseType<null>> {
+    return this.blogService.blogViews(id, payload.userId);
+  }
 }

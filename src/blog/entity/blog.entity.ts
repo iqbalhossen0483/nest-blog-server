@@ -28,8 +28,19 @@ export class BlogEntity {
   @JoinColumn({ name: 'author' })
   author: UserEntity;
 
-  @Column('int', { array: true, default: [] })
-  views: number[]; // to do: make it unique for each blog
+  @ManyToMany(() => UserEntity, (user) => user.views)
+  @JoinTable({
+    name: 'blog_views',
+    joinColumn: {
+      name: 'blogId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'userId',
+      referencedColumnName: 'id',
+    },
+  })
+  views: UserEntity[];
 
   @ManyToMany(() => UserEntity, (user) => user.likedBlogs)
   @JoinTable({

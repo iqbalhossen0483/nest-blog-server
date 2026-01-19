@@ -52,6 +52,9 @@ export class UserEntity {
   @ManyToMany(() => BlogEntity, (blog) => blog.dislikes)
   dislikedBlogs: BlogEntity[];
 
+  @ManyToMany(() => BlogEntity, (blog) => blog.views)
+  views: BlogEntity[];
+
   @Column({ default: true })
   isActive: boolean;
 

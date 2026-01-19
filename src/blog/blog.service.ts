@@ -60,6 +60,7 @@ export class BlogService {
       .leftJoinAndSelect('comment.author', 'commentAuthor')
       .leftJoinAndSelect('blog.likes', 'likes')
       .leftJoinAndSelect('blog.dislikes', 'dislikes')
+      .loadRelationCountAndMap('blog.viewsCount', 'blog.views')
       .select([
         'blog',
         'author.id',
@@ -263,6 +264,32 @@ export class BlogService {
     return {
       success: true,
       message: 'Blog disliked successfully',
+      data: null,
+    };
+  }
+
+  async blogViews(id: number, userId: number): Promise<ResponseType<null>> {
+    const blog = await this.blogRepo.findOne({
+      where: { id },
+      relations: ['views'],
+    });
+    if (!blog) {
+      throw new NotFoundException("Blog doesn't exist");
+    }
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException("User doesn't exist");
+    }
+
+    if (blog.views.some((user) => user.id === user.id)) {
+      throw new ConflictException('You have already viewed this blog');
+    }
+
+    blog.views.push(user);
+    await this.blogRepo.save(blog);
+    return {
+      success: true,
+      message: 'Blog views updated successfully',
       data: null,
     };
   }
