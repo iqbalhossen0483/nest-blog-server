@@ -50,10 +50,32 @@ export class BlogService {
     };
   }
   async getSingleBlog(id: number): Promise<ResponseType<BlogEntity>> {
-    const blog = await this.blogRepo.findOne({
-      where: { id },
-      relations: ['comments', 'author'],
-    });
+    const blog = await this.blogRepo
+      .createQueryBuilder('blog')
+      .leftJoinAndSelect('blog.author', 'author')
+      .leftJoinAndSelect('blog.comments', 'comment')
+      .leftJoinAndSelect('comment.author', 'commentAuthor')
+      .leftJoinAndSelect('blog.likes', 'likes')
+      .leftJoinAndSelect('blog.dislikes', 'dislikes')
+      .select([
+        'blog',
+        'author.id',
+        'author.name',
+        'author.email',
+        'comment',
+        'commentAuthor.id',
+        'commentAuthor.name',
+        'commentAuthor.email',
+        'likes.id',
+        'likes.name',
+        'likes.email',
+        'dislikes.id',
+        'dislikes.name',
+        'dislikes.email',
+      ])
+      .where('blog.id = :id', { id })
+      .getOne();
+
     if (!blog) {
       throw new NotFoundException("Blog doesn't exist");
     }
@@ -159,19 +181,28 @@ export class BlogService {
   }
 
   async likeBlog(id: number, userId: number): Promise<ResponseType<null>> {
-    const blog = await this.blogRepo.findOne({ where: { id } });
+    const blog = await this.blogRepo.findOne({
+      where: { id },
+      relations: ['likes', 'dislikes'],
+    });
     if (!blog) {
       throw new NotFoundException("Blog doesn't exist");
     }
-    if (blog.likes.includes(userId)) {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException("User doesn't exist");
+    }
+    if (blog.likes.includes(user)) {
       throw new ConflictException('You have already liked this blog');
     }
 
-    if (blog.dislikes.includes(userId)) {
-      blog.dislikes = blog.dislikes.filter((dislike) => dislike !== userId);
+    if (blog.dislikes.includes(user)) {
+      blog.dislikes = blog.dislikes.filter(
+        (dislikeUser) => dislikeUser !== user,
+      );
     }
 
-    blog.likes.push(userId);
+    blog.likes.push(user);
     await this.blogRepo.save(blog);
     return {
       success: true,
@@ -186,14 +217,19 @@ export class BlogService {
       throw new NotFoundException("Blog doesn't exist");
     }
 
-    if (blog.dislikes.includes(userId)) {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException("User doesn't exist");
+    }
+
+    if (blog.dislikes.includes(user)) {
       throw new ConflictException('You have already disliked this blog');
     }
 
-    if (blog.likes.includes(userId)) {
-      blog.likes = blog.likes.filter((like) => like !== userId);
+    if (blog.likes.includes(user)) {
+      blog.likes = blog.likes.filter((likeUser) => likeUser !== user);
     }
-    blog.dislikes.push(userId);
+    blog.dislikes.push(user);
     await this.blogRepo.save(blog);
     return {
       success: true,

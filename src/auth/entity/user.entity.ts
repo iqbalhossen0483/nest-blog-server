@@ -4,6 +4,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -44,6 +45,12 @@ export class UserEntity {
 
   @OneToMany(() => BlogEntity, (blog) => blog.author)
   comments: CommentEntity[];
+
+  @ManyToMany(() => BlogEntity, (blog) => blog.likes)
+  likedBlogs: BlogEntity[];
+
+  @ManyToMany(() => BlogEntity, (blog) => blog.dislikes)
+  dislikedBlogs: BlogEntity[];
 
   @Column({ default: true })
   isActive: boolean;

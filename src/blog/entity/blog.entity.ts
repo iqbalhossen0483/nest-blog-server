@@ -5,6 +5,8 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -26,14 +28,36 @@ export class BlogEntity {
   @JoinColumn({ name: 'author' })
   author: UserEntity;
 
-  @Column('int', { default: 0 })
-  views: number;
-
   @Column('int', { array: true, default: [] })
-  likes: number[];
+  views: number[]; // to do: make it unique for each blog
 
-  @Column('int', { array: true, default: [] })
-  dislikes: number[];
+  @ManyToMany(() => UserEntity, (user) => user.likedBlogs)
+  @JoinTable({
+    name: 'blog_likes',
+    joinColumn: {
+      name: 'blogId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'userId',
+      referencedColumnName: 'id',
+    },
+  })
+  likes: UserEntity[];
+
+  @ManyToMany(() => UserEntity, (user) => user.dislikedBlogs)
+  @JoinTable({
+    name: 'blog_dislikes',
+    joinColumn: {
+      name: 'blogId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'userId',
+      referencedColumnName: 'id',
+    },
+  })
+  dislikes: UserEntity[];
 
   @OneToMany(() => CommentEntity, (comment) => comment.blog)
   comments: CommentEntity[];
