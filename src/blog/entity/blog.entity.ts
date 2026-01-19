@@ -73,6 +73,20 @@ export class BlogEntity {
   @OneToMany(() => CommentEntity, (comment) => comment.blog)
   comments: CommentEntity[];
 
+  @ManyToMany(() => UserEntity, (user) => user.bookmarks)
+  @JoinTable({
+    name: 'blog_bookmarks',
+    joinColumn: {
+      name: 'blogId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'userId',
+      referencedColumnName: 'id',
+    },
+  })
+  bookmarks: UserEntity[];
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -98,6 +112,34 @@ export class CommentEntity {
   @ManyToOne(() => BlogEntity, (blog) => blog.comments, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'blogId' })
   blog: BlogEntity;
+
+  @ManyToMany(() => UserEntity, (user) => user.likedComments)
+  @JoinTable({
+    name: 'comment_likes',
+    joinColumn: {
+      name: 'commentId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'userId',
+      referencedColumnName: 'id',
+    },
+  })
+  likes: UserEntity[];
+
+  @ManyToMany(() => UserEntity, (user) => user.dislikedComments)
+  @JoinTable({
+    name: 'comment_dislikes',
+    joinColumn: {
+      name: 'commentId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'userId',
+      referencedColumnName: 'id',
+    },
+  })
+  dislikes: UserEntity[];
 
   @CreateDateColumn()
   createdAt: Date;
