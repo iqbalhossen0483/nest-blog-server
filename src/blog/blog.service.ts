@@ -225,7 +225,7 @@ export class BlogService {
 
     if (blog.dislikes.some((user) => user.id === user.id)) {
       blog.dislikes = blog.dislikes.filter(
-        (dislikeUser) => dislikeUser !== user,
+        (dislikeUser) => dislikeUser.id !== user.id,
       );
     }
 
@@ -257,7 +257,7 @@ export class BlogService {
     }
 
     if (blog.likes.some((user) => user.id === user.id)) {
-      blog.likes = blog.likes.filter((likeUser) => likeUser !== user);
+      blog.likes = blog.likes.filter((likeUser) => likeUser.id !== user.id);
     }
     blog.dislikes.push(user);
     await this.blogRepo.save(blog);
