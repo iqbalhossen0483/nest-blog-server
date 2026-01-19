@@ -4,7 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { compareSync, genSaltSync, hashSync } from 'bcrypt-ts';
+import * as bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
 import { ResponseType } from '../type/common.type';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
@@ -24,8 +24,8 @@ export class AuthService {
       throw new ConflictException('User already exist');
     }
 
-    const salt = genSaltSync(10);
-    const hashPassword = hashSync(payload.password, salt);
+    const salt = bcrypt.genSaltSync(10);
+    const hashPassword = bcrypt.hashSync(payload.password, salt);
     payload.password = hashPassword;
     const user = await this.userRepo.save(payload);
 
@@ -45,7 +45,7 @@ export class AuthService {
       throw new UnauthorizedException('User not exist or invalid credentials');
     }
 
-    const isPasswordValid = compareSync(payload.password, user.password);
+    const isPasswordValid = bcrypt.compareSync(payload.password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
