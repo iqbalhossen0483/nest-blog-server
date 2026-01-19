@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Param, Post, Put } from '@nestjs/common';
 import { ResponseType } from '../type/common.type';
 import { CommentService } from './comment.service';
-import { commentDto } from './dto/blog.dto';
+import { commentDto, LikeDislikeBlogDto } from './dto/blog.dto';
 import { CommentEntity } from './entity/blog.entity';
 
 @Controller('blog/comment')
@@ -26,5 +26,21 @@ export class CommentController {
   @Delete('delete/:id')
   async deleteComment(@Param('id') id: number): Promise<ResponseType<null>> {
     return await this.commentService.deleteComment(id);
+  }
+
+  @Post('like/:id')
+  async likeComment(
+    @Param('id') id: number,
+    @Body() payload: LikeDislikeBlogDto,
+  ): Promise<ResponseType<null>> {
+    return await this.commentService.likeComment(id, payload.userId);
+  }
+
+  @Post('dislike/:id')
+  async dislikeComment(
+    @Param('id') id: number,
+    @Body() payload: LikeDislikeBlogDto,
+  ): Promise<ResponseType<null>> {
+    return await this.commentService.dislikeComment(id, payload.userId);
   }
 }

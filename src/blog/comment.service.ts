@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/auth/entity/user.entity';
 import { Repository } from 'typeorm';
@@ -88,6 +92,71 @@ export class CommentService {
     return {
       success: true,
       message: 'Comment deleted successfully',
+      data: null,
+    };
+  }
+
+  async likeComment(id: number, userId: number): Promise<ResponseType<null>> {
+    const comment = await this.commentRepo.findOne({
+      where: { id },
+      relations: ['likes', 'dislikes'],
+    });
+    if (!comment) {
+      throw new NotFoundException("Comment doesn't exist");
+    }
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException("User doesn't exist");
+    }
+    if (comment.likes.some((user) => user.id === user.id)) {
+      throw new ConflictException('You have already liked this comment');
+    }
+    if (comment.dislikes.some((user) => user.id === user.id)) {
+      comment.dislikes = comment.dislikes.filter(
+        (dislikeUser) => dislikeUser.id !== user.id,
+      );
+    }
+
+    comment.likes.push(user);
+    await this.commentRepo.save(comment);
+    return {
+      success: true,
+      message: 'Comment liked successfully',
+      data: null,
+    };
+  }
+
+  async dislikeComment(
+    id: number,
+    userId: number,
+  ): Promise<ResponseType<null>> {
+    const comment = await this.commentRepo.findOne({
+      where: { id },
+      relations: ['likes', 'dislikes'],
+    });
+    if (!comment) {
+      throw new NotFoundException("Comment doesn't exist");
+    }
+
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException("User doesn't exist");
+    }
+
+    if (comment.dislikes.some((user) => user.id === user.id)) {
+      throw new ConflictException('You have already disliked this comment');
+    }
+
+    if (comment.likes.some((user) => user.id === user.id)) {
+      comment.likes = comment.likes.filter(
+        (likeUser) => likeUser.id !== user.id,
+      );
+    }
+    comment.dislikes.push(user);
+    await this.commentRepo.save(comment);
+    return {
+      success: true,
+      message: 'Comment disliked successfully',
       data: null,
     };
   }
