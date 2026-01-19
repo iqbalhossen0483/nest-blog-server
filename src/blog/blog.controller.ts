@@ -13,7 +13,12 @@ import {
 } from '@nestjs/common';
 import type { ResponseType } from '../type/common.type';
 import { BlogService } from './blog.service';
-import { blogDto, BlogsQueryDto, updateBlogDto } from './dto/blog.dto';
+import {
+  blogDto,
+  BlogsQueryDto,
+  LikeDislikeBlogDto,
+  updateBlogDto,
+} from './dto/blog.dto';
 import { BlogEntity } from './entity/blog.entity';
 
 @Controller('blog')
@@ -66,5 +71,21 @@ export class BlogController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<ResponseType<null>> {
     return this.blogService.restoreBlog(id);
+  }
+
+  @Post('/like/:id')
+  likeBlog(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() payload: LikeDislikeBlogDto,
+  ): Promise<ResponseType<null>> {
+    return this.blogService.likeBlog(id, payload.userId);
+  }
+
+  @Post('/dislike/:id')
+  dislikeBlog(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() payload: LikeDislikeBlogDto,
+  ): Promise<ResponseType<null>> {
+    return this.blogService.dislikeBlog(id, payload.userId);
   }
 }

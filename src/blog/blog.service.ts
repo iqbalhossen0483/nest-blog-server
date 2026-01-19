@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ResponseType } from '../type/common.type';
@@ -131,6 +135,14 @@ export class BlogService {
     if (!blog) {
       throw new NotFoundException("Blog doesn't exist");
     }
+    if (blog.likes.includes(userId)) {
+      throw new ConflictException('You have already liked this blog');
+    }
+
+    if (blog.dislikes.includes(userId)) {
+      blog.dislikes = blog.dislikes.filter((dislike) => dislike !== userId);
+    }
+
     blog.likes.push(userId);
     await this.blogRepo.save(blog);
     return {
@@ -145,7 +157,14 @@ export class BlogService {
     if (!blog) {
       throw new NotFoundException("Blog doesn't exist");
     }
-    blog.likes = blog.likes.filter((like) => like !== userId);
+
+    if (blog.dislikes.includes(userId)) {
+      throw new ConflictException('You have already disliked this blog');
+    }
+
+    if (blog.likes.includes(userId)) {
+      blog.likes = blog.likes.filter((like) => like !== userId);
+    }
     blog.dislikes.push(userId);
     await this.blogRepo.save(blog);
     return {

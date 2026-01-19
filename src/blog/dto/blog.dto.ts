@@ -75,3 +75,9 @@ export class BlogsQueryDto {
   @IsInt()
   limit?: number;
 }
+
+export class LikeDislikeBlogDto {
+  @IsNotEmpty({ message: 'User id is required' })
+  @IsNumber({ allowNaN: false }, { message: 'User id must be a number' })
+  userId: number;
+}
