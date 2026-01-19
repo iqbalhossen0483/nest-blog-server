@@ -24,7 +24,7 @@ export class UserEntity {
   @Column({ unique: true })
   email: string;
 
-  @Column({ select: false })
+  @Column()
   password: string;
 
   @Column()
@@ -61,10 +61,10 @@ export class UserEntity {
   @Column({ default: false })
   isVerified: boolean;
 
-  @Column({ nullable: true, select: false })
+  @Column({ nullable: true })
   accessToken: string;
 
-  @Column({ nullable: true, select: false })
+  @Column({ nullable: true })
   refreshToken: string;
 
   @CreateDateColumn()
