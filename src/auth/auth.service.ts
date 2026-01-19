@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { compareSync, genSaltSync, hashSync } from 'bcrypt-ts';
 import { ResponseType } from 'src/type/common.type';
 import { Repository } from 'typeorm';
+import { LoginDto, RegisterDto } from './dto/auth.dto';
 import { UserEntity } from './entity/user.entity';
 
 @Injectable()
@@ -11,7 +12,7 @@ export class AuthService {
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
   ) {}
 
-  async register(payload: UserEntity): Promise<ResponseType<UserEntity>> {
+  async register(payload: RegisterDto): Promise<ResponseType<UserEntity>> {
     const isExist = await this.userRepo.findOne({
       where: { email: payload.email },
     });
@@ -31,7 +32,7 @@ export class AuthService {
     };
   }
 
-  async login(payload: UserEntity): Promise<ResponseType<UserEntity>> {
+  async login(payload: LoginDto): Promise<ResponseType<UserEntity>> {
     const user = await this.userRepo.findOne({
       where: { email: payload.email },
     });
