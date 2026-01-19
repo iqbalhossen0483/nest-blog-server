@@ -27,8 +27,11 @@ export class BlogService {
     const queryBuilder = this.blogRepo
       .createQueryBuilder('blog')
       .loadRelationCountAndMap('blog.commentCount', 'blog.comments')
-      .innerJoinAndSelect('blog.author', 'author')
-      .orderBy('blog.createdAt', 'DESC')
+      .loadRelationCountAndMap('blog.likeCount', 'blog.likes')
+      .loadRelationCountAndMap('blog.dislikeCount', 'blog.dislikes')
+      .leftJoinAndSelect('blog.author', 'author')
+      .select(['blog', 'author.id', 'author.name', 'author.email'])
+      .orderBy('blog.createdAt', 'ASC')
       .skip(skip)
       .take(limit);
 
