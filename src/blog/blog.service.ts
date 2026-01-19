@@ -45,7 +45,7 @@ export class BlogService {
 
     return {
       success: true,
-      message: 'Blogs found',
+      message: 'Blogs fetched successfully',
       data: blogs,
       meta: {
         total: count,
@@ -118,7 +118,7 @@ export class BlogService {
 
     return {
       success: true,
-      message: 'Blog found',
+      message: 'Blog fetched successfully',
       data: blog,
       meta: {
         total: count,
