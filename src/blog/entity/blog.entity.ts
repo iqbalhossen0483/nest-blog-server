@@ -141,6 +141,16 @@ export class CommentEntity {
   })
   dislikes: UserEntity[];
 
+  @ManyToOne(() => CommentEntity, (comment) => comment.replies, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'parentId' })
+  parent: CommentEntity;
+
+  @OneToMany(() => CommentEntity, (comment) => comment.parent)
+  replies: CommentEntity[];
+
   @CreateDateColumn()
   createdAt: Date;
 

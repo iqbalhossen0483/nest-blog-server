@@ -58,6 +58,10 @@ export class commentDto {
   @IsNotEmpty({ message: 'Blog id is required' })
   @IsNumber({ allowNaN: false }, { message: 'Blog must be a number' })
   blogId: number;
+
+  @IsOptional()
+  @IsNumber({ allowNaN: false }, { message: 'Parent id must be a number' })
+  parentId?: number;
 }
 
 export class BlogsQueryDto {

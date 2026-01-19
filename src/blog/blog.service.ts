@@ -58,6 +58,8 @@ export class BlogService {
       .leftJoinAndSelect('blog.author', 'author')
       .leftJoinAndSelect('blog.comments', 'comment')
       .leftJoinAndSelect('comment.author', 'commentAuthor')
+      .leftJoinAndSelect('comment.replies', 'replies')
+      .leftJoinAndSelect('replies.author', 'replyAuthor')
       .leftJoinAndSelect('blog.likes', 'likes')
       .leftJoinAndSelect('blog.dislikes', 'dislikes')
       .loadRelationCountAndMap('blog.viewsCount', 'blog.views')
@@ -84,8 +86,12 @@ export class BlogService {
         'commentDislikes.id',
         'commentDislikes.name',
         'commentDislikes.email',
+        'replies',
+        'replyAuthor.id',
+        'replyAuthor.name',
+        'replyAuthor.email',
       ])
-      .where('blog.id = :id', { id })
+      .where('blog.id = :id AND comment.parent IS NULL', { id })
       .getOne();
 
     if (!blog) {

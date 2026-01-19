@@ -37,8 +37,17 @@ export class CommentService {
       throw new NotFoundException("Author doesn't exist");
     }
 
+    let parent: CommentEntity | undefined = undefined;
+    if (payload.parentId) {
+      parent =
+        (await this.commentRepo.findOne({
+          where: { id: payload.parentId },
+        })) || undefined;
+    }
+
     const newBlog = await this.commentRepo.save({
       text: payload.text,
+      parent,
       blog,
       author,
     });
