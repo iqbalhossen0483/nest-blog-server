@@ -8,13 +8,15 @@ import { UserEntity } from 'src/auth/entity/user.entity';
 import { In, Repository } from 'typeorm';
 import { ResponseType } from '../type/common.type';
 import { blogDto, updateBlogDto } from './dto/blog.dto';
-import { BlogEntity } from './entity/blog.entity';
+import { BlogEntity, CommentEntity } from './entity/blog.entity';
 
 @Injectable()
 export class BlogService {
   constructor(
     @InjectRepository(BlogEntity) private blogRepo: Repository<BlogEntity>,
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
+    @InjectRepository(CommentEntity)
+    private commentRepo: Repository<CommentEntity>,
   ) {}
 
   async getBlogs(
@@ -52,55 +54,77 @@ export class BlogService {
       },
     };
   }
-  async getSingleBlog(id: number): Promise<ResponseType<BlogEntity>> {
+  async getSingleBlog(
+    id: number,
+    page = 1,
+    limit = 10,
+  ): Promise<ResponseType<BlogEntity>> {
+    const skip = (page - 1) * limit;
+
     const blog = await this.blogRepo
       .createQueryBuilder('blog')
       .leftJoinAndSelect('blog.author', 'author')
-      .leftJoinAndSelect('blog.comments', 'comment')
-      .leftJoinAndSelect('comment.author', 'commentAuthor')
-      .leftJoinAndSelect('comment.replies', 'replies')
-      .leftJoinAndSelect('replies.author', 'replyAuthor')
       .leftJoinAndSelect('blog.likes', 'likes')
       .leftJoinAndSelect('blog.dislikes', 'dislikes')
       .loadRelationCountAndMap('blog.viewsCount', 'blog.views')
-      .leftJoinAndSelect('comment.likes', 'commentLikes')
-      .leftJoinAndSelect('comment.dislikes', 'commentDislikes')
       .select([
         'blog',
         'author.id',
         'author.name',
         'author.email',
-        'comment',
-        'commentAuthor.id',
-        'commentAuthor.name',
-        'commentAuthor.email',
         'likes.id',
         'likes.name',
         'likes.email',
         'dislikes.id',
         'dislikes.name',
         'dislikes.email',
-        'commentLikes.id',
-        'commentLikes.name',
-        'commentLikes.email',
-        'commentDislikes.id',
-        'commentDislikes.name',
-        'commentDislikes.email',
-        'replies',
-        'replyAuthor.id',
-        'replyAuthor.name',
-        'replyAuthor.email',
       ])
-      .where('blog.id = :id AND comment.parent IS NULL', { id })
+      .where('blog.id = :id', { id })
+      .skip(skip)
+      .limit(limit)
       .getOne();
 
     if (!blog) {
       throw new NotFoundException("Blog doesn't exist");
     }
+
+    const [comments, count] = await this.commentRepo
+      .createQueryBuilder('comment')
+      .leftJoinAndSelect('comment.author', 'author')
+      .leftJoinAndSelect('comment.likes', 'likes')
+      .leftJoinAndSelect('comment.dislikes', 'dislikes')
+      .leftJoinAndSelect('comment.replies', 'replies')
+      .leftJoinAndSelect('replies.author', 'replyAuthor')
+      .select([
+        'comment',
+        'author.id',
+        'author.name',
+        'author.email',
+        'likes.id',
+        'likes.name',
+        'likes.email',
+        'dislikes.id',
+        'dislikes.name',
+        'dislikes.email',
+        'replies',
+        'replyAuthor.id',
+        'replyAuthor.name',
+        'replyAuthor.email',
+      ])
+      .where('comment.blogId = :id AND comment.parent IS NULL', { id })
+      .getManyAndCount();
+
+    blog.comments = comments;
+
     return {
       success: true,
       message: 'Blog found',
       data: blog,
+      meta: {
+        total: count,
+        page,
+        last_page: Math.ceil(count / limit),
+      },
     };
   }
   async createBlog(payload: blogDto): Promise<ResponseType<BlogEntity>> {

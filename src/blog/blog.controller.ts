@@ -33,8 +33,9 @@ export class BlogController {
   @Get('/get-single/:id')
   getSingleBlog(
     @Param('id', ParseIntPipe) id: number,
+    @Query() query: BlogsQueryDto,
   ): Promise<ResponseType<BlogEntity>> {
-    return this.blogService.getSingleBlog(id);
+    return this.blogService.getSingleBlog(id, query.page, query.limit);
   }
 
   @Post('/create')
