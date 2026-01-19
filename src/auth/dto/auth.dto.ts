@@ -2,16 +2,16 @@ import {
   IsEmail,
   IsNotEmpty,
   IsString,
-  Max,
-  Min,
+  MaxLength,
+  MinLength,
   Validate,
 } from 'class-validator';
 
 export class RegisterDto {
   @IsNotEmpty({ message: 'Name is required' })
   @IsString({ message: 'Name must be a string' })
-  @Max(50, { message: 'Name must be at most 50 characters long' })
-  @Min(3, { message: 'Name must be at least 3 characters long' })
+  @MaxLength(50, { message: 'Name must be at most 50 characters long' })
+  @MinLength(3, { message: 'Name must be at least 3 characters long' })
   name: string;
 
   @IsNotEmpty({ message: 'Email is required' })
@@ -20,7 +20,7 @@ export class RegisterDto {
   email: string;
 
   @IsNotEmpty({ message: 'Password is required' })
-  @Min(6, { message: 'Password must be at least 6 characters long' })
+  @MinLength(6, { message: 'Password must be at least 6 characters long' })
   @Validate(
     (value: string) => {
       const regex =
@@ -41,7 +41,7 @@ export class LoginDto {
   email: string;
 
   @IsNotEmpty({ message: 'Password is required' })
-  @Min(6, { message: 'Password must be at least 6 characters long' })
+  @MinLength(6, { message: 'Password must be at least 6 characters long' })
   @Validate(
     (value: string) => {
       const regex =

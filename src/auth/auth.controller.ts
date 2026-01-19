@@ -12,6 +12,7 @@ export class AuthController {
   async register(
     @Body() payload: RegisterDto,
   ): Promise<ResponseType<UserEntity>> {
+    console.log(payload);
     return this.authService.register(payload);
   }
 

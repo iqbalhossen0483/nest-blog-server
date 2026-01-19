@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { compareSync, genSaltSync, hashSync } from 'bcrypt-ts';
 import { ResponseType } from 'src/type/common.type';
@@ -17,7 +21,7 @@ export class AuthService {
       where: { email: payload.email },
     });
     if (isExist) {
-      throw new NotFoundException('User already exist');
+      throw new ConflictException('User already exist');
     }
 
     const salt = genSaltSync(10);
@@ -38,12 +42,12 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not exist or invalid credentials');
+      throw new UnauthorizedException('User not exist or invalid credentials');
     }
 
     const isPasswordValid = compareSync(payload.password, user.password);
     if (!isPasswordValid) {
-      throw new NotFoundException('Invalid credentials');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     return {
