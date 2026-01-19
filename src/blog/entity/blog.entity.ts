@@ -30,6 +30,9 @@ export class BlogEntity {
   @Column('int', { array: true, default: [] })
   likes: number[];
 
+  @Column('int', { array: true, default: [] })
+  dislikes: number[];
+
   @OneToMany(() => CommentEntity, (comment) => comment.blog)
   comments: CommentEntity[];
 

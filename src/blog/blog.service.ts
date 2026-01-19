@@ -125,4 +125,33 @@ export class BlogService {
       data: null,
     };
   }
+
+  async likeBlog(id: number, userId: number): Promise<ResponseType<null>> {
+    const blog = await this.blogRepo.findOne({ where: { id } });
+    if (!blog) {
+      throw new NotFoundException("Blog doesn't exist");
+    }
+    blog.likes.push(userId);
+    await this.blogRepo.save(blog);
+    return {
+      success: true,
+      message: 'Blog liked successfully',
+      data: null,
+    };
+  }
+
+  async dislikeBlog(id: number, userId: number): Promise<ResponseType<null>> {
+    const blog = await this.blogRepo.findOne({ where: { id } });
+    if (!blog) {
+      throw new NotFoundException("Blog doesn't exist");
+    }
+    blog.likes = blog.likes.filter((like) => like !== userId);
+    blog.dislikes.push(userId);
+    await this.blogRepo.save(blog);
+    return {
+      success: true,
+      message: 'Blog disliked successfully',
+      data: null,
+    };
+  }
 }
