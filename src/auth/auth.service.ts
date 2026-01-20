@@ -48,12 +48,16 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new UnauthorizedException('User not exist or invalid credentials');
+      throw new UnauthorizedException(
+        'Invalid credentials or account not exist',
+      );
     }
 
     const isPasswordValid = bcrypt.compareSync(payload.password, user.password);
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException(
+        'Invalid credentials or account not exist',
+      );
     }
 
     const { password: _password, ...rest } = user;
