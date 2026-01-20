@@ -11,13 +11,15 @@ export class AuthController {
   @Post('register')
   async register(
     @Body() payload: RegisterDto,
-  ): Promise<ResponseType<UserEntity>> {
+  ): Promise<ResponseType<Omit<UserEntity, 'password'>>> {
     console.log(payload);
     return this.authService.register(payload);
   }
 
   @Post('login')
-  async login(@Body() payload: LoginDto): Promise<ResponseType<UserEntity>> {
+  async login(
+    @Body() payload: LoginDto,
+  ): Promise<ResponseType<Omit<UserEntity, 'password'>>> {
     return this.authService.login(payload);
   }
 }

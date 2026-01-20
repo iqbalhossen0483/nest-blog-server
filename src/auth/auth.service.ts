@@ -16,7 +16,9 @@ export class AuthService {
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
   ) {}
 
-  async register(payload: RegisterDto): Promise<ResponseType<UserEntity>> {
+  async register(
+    payload: RegisterDto,
+  ): Promise<ResponseType<Omit<UserEntity, 'password'>>> {
     const isExist = await this.userRepo.findOne({
       where: { email: payload.email },
     });
@@ -29,14 +31,18 @@ export class AuthService {
     payload.password = hashPassword;
     const user = await this.userRepo.save(payload);
 
+    const { password: _password, ...rest } = user;
+
     return {
       success: true,
       message: 'User created successfully',
-      data: user,
+      data: rest,
     };
   }
 
-  async login(payload: LoginDto): Promise<ResponseType<UserEntity>> {
+  async login(
+    payload: LoginDto,
+  ): Promise<ResponseType<Omit<UserEntity, 'password'>>> {
     const user = await this.userRepo.findOne({
       where: { email: payload.email },
     });
@@ -50,10 +56,12 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    const { password: _password, ...rest } = user;
+
     return {
       success: true,
       message: 'User logged in successfully',
-      data: user,
+      data: rest,
     };
   }
 }
