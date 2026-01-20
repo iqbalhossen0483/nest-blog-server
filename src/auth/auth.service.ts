@@ -3,8 +3,11 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
+import { Response } from 'express';
+import { config } from 'src/config/config';
 import { Repository } from 'typeorm';
 import { ResponseType } from '../type/common.type';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
@@ -14,10 +17,12 @@ import { UserEntity } from './entity/user.entity';
 export class AuthService {
   constructor(
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
+    private JWTService: JwtService,
   ) {}
 
   async register(
     payload: RegisterDto,
+    res: Response,
   ): Promise<ResponseType<Omit<UserEntity, 'password'>>> {
     const isExist = await this.userRepo.findOne({
       where: { email: payload.email },
@@ -33,15 +38,23 @@ export class AuthService {
 
     const { password: _password, ...rest } = user;
 
+    const accessToken = await this.generateAccessToken(user);
+    const refreshToken = await this.generateRefreshToken(user);
+
+    this.setAuthCookies(res, accessToken, refreshToken);
+
     return {
       success: true,
       message: 'User created successfully',
       data: rest,
+      accessToken,
+      refreshToken,
     };
   }
 
   async login(
     payload: LoginDto,
+    res: Response,
   ): Promise<ResponseType<Omit<UserEntity, 'password'>>> {
     const user = await this.userRepo.findOne({
       where: { email: payload.email },
@@ -62,10 +75,54 @@ export class AuthService {
 
     const { password: _password, ...rest } = user;
 
+    const accessToken = await this.generateAccessToken(user);
+    const refreshToken = await this.generateRefreshToken(user);
+
+    this.setAuthCookies(res, accessToken, refreshToken);
+
     return {
       success: true,
       message: 'User logged in successfully',
       data: rest,
+      accessToken,
+      refreshToken,
     };
+  }
+
+  async generateAccessToken(user: UserEntity): Promise<string> {
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    };
+    return this.JWTService.signAsync(payload, {
+      secret: config.jwtSecret,
+      expiresIn: '30m',
+    });
+  }
+
+  async generateRefreshToken(user: UserEntity): Promise<string> {
+    const payload = {
+      sub: user.id,
+    };
+    return this.JWTService.signAsync(payload, {
+      secret: config.jwtSecret,
+      expiresIn: '7d',
+    });
+  }
+
+  setAuthCookies(res: Response, accessToken: string, refreshToken: string) {
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 1000 * 60 * 30,
+    });
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    });
   }
 }

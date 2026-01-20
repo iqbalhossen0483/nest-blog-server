@@ -7,4 +7,6 @@ export interface ResponseType<T> {
     total: number;
     last_page: number;
   };
+  accessToken?: string;
+  refreshToken?: string;
 }

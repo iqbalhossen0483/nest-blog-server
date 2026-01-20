@@ -1,4 +1,5 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Res } from '@nestjs/common';
+import type { Response } from 'express';
 import { ResponseType } from '../type/common.type';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
@@ -11,15 +12,16 @@ export class AuthController {
   @Post('register')
   async register(
     @Body() payload: RegisterDto,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<ResponseType<Omit<UserEntity, 'password'>>> {
-    console.log(payload);
-    return this.authService.register(payload);
+    return this.authService.register(payload, res);
   }
 
   @Post('login')
   async login(
     @Body() payload: LoginDto,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<ResponseType<Omit<UserEntity, 'password'>>> {
-    return this.authService.login(payload);
+    return this.authService.login(payload, res);
   }
 }
