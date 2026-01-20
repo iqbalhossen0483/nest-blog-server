@@ -1,5 +1,6 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { config, NODE_ENV } from './config/config';
 
@@ -15,6 +16,7 @@ async function bootstrap() {
   );
 
   app.setGlobalPrefix('api');
+  app.use(cookieParser());
   app.useLogger([
     config.nodeEnv === NODE_ENV.DEVELOPMENT ? 'error' : 'log',
     'debug',
