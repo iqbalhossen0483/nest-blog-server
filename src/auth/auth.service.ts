@@ -12,6 +12,7 @@ import { Repository } from 'typeorm';
 import { ResponseType } from '../type/common.type';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
 import { UserEntity } from './entity/user.entity';
+import { JWTPayload } from './interface/auth.interface';
 
 @Injectable()
 export class AuthService {
@@ -90,7 +91,7 @@ export class AuthService {
   }
 
   async generateAccessToken(user: UserEntity): Promise<string> {
-    const payload = {
+    const payload: JWTPayload = {
       sub: user.id,
       email: user.email,
       role: user.role,
@@ -124,5 +125,15 @@ export class AuthService {
       sameSite: 'none',
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
+  }
+
+  async getUserById(userId: number): Promise<UserEntity> {
+    const user = await this.userRepo.findOne({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    return user;
   }
 }
