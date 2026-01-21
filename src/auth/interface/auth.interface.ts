@@ -8,4 +8,8 @@ export interface JWTPayload {
 }
 export interface AuthenticatedRequest extends Request {
   user: JWTPayload;
+  cookies: {
+    accessToken?: string;
+    refreshToken?: string;
+  };
 }
