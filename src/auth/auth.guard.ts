@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { config } from 'src/config/config';
 import { AuthenticatedRequest, JWTPayload } from './interface/auth.interface';
 
 @Injectable()
@@ -18,7 +19,9 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('Unauthorized user');
     }
     try {
-      const payload = await this.jwtService.verifyAsync<JWTPayload>(token);
+      const payload = await this.jwtService.verifyAsync<JWTPayload>(token, {
+        secret: config.jwtSecret,
+      });
       request.user = payload;
     } catch {
       throw new UnauthorizedException('Invalid token');

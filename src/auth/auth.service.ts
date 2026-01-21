@@ -90,7 +90,9 @@ export class AuthService {
     };
   }
 
-  async generateAccessToken(user: UserEntity): Promise<string> {
+  async generateAccessToken(
+    user: Omit<UserEntity, 'password'>,
+  ): Promise<string> {
     const payload: JWTPayload = {
       sub: user.id,
       email: user.email,
@@ -102,7 +104,9 @@ export class AuthService {
     });
   }
 
-  async generateRefreshToken(user: UserEntity): Promise<string> {
+  async generateRefreshToken(
+    user: Omit<UserEntity, 'password'>,
+  ): Promise<string> {
     const payload = {
       sub: user.id,
     };
@@ -127,13 +131,43 @@ export class AuthService {
     });
   }
 
-  async getUserById(userId: number): Promise<UserEntity> {
+  async getUserById(userId: number): Promise<Omit<UserEntity, 'password'>> {
     const user = await this.userRepo.findOne({
       where: { id: userId },
     });
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
-    return user;
+    const { password: _password, ...rest } = user;
+    return rest;
+  }
+
+  async refreshToken(
+    user: JWTPayload,
+    res: Response,
+  ): Promise<ResponseType<null>> {
+    const userData = await this.getUserById(user.sub);
+
+    const accessToken = await this.generateAccessToken(userData);
+    const refreshToken = await this.generateRefreshToken(userData);
+    this.setAuthCookies(res, accessToken, refreshToken);
+
+    return {
+      success: true,
+      message: 'Token refreshed successfully',
+      data: null,
+      accessToken,
+      refreshToken,
+    };
+  }
+
+  logout(res: Response): ResponseType<null> {
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+    return {
+      success: true,
+      message: 'User logged out successfully',
+      data: null,
+    };
   }
 }

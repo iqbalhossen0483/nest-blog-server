@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import type { Response } from 'express';
-import { ResponseType } from '../type/common.type';
+import type { ResponseType } from '../type/common.type';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
@@ -37,7 +37,24 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Get('profile')
-  userProfile(@Request() req: AuthenticatedRequest): Promise<UserEntity> {
+  userProfile(
+    @Request() req: AuthenticatedRequest,
+  ): Promise<Omit<UserEntity, 'password'>> {
     return this.authService.getUserById(req.user.sub);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('refresh')
+  async refreshToken(
+    @Request() req: AuthenticatedRequest,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<ResponseType<null>> {
+    return this.authService.refreshToken(req.user, res);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('logout')
+  logout(@Res({ passthrough: true }) res: Response): ResponseType<null> {
+    return this.authService.logout(res);
   }
 }
