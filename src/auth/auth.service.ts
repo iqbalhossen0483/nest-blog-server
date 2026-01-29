@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
-import { config } from 'src/config/config';
+import { Configaration } from 'src/config/configaration';
 import { Repository } from 'typeorm';
 import { ResponseType } from '../type/common.type';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
@@ -99,7 +99,7 @@ export class AuthService {
       role: user.role,
     };
     return this.JWTService.signAsync(payload, {
-      secret: config.jwtSecret,
+      secret: Configaration.jwtSecret,
       expiresIn: '30m',
     });
   }
@@ -111,7 +111,7 @@ export class AuthService {
       sub: user.id,
     };
     return this.JWTService.signAsync(payload, {
-      secret: config.jwtSecret,
+      secret: Configaration.jwtSecret,
       expiresIn: '7d',
     });
   }
