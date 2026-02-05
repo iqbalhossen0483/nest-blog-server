@@ -1,11 +1,16 @@
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
-import { Configaration, NODE_ENV } from './config/configaration';
+import { NODE_ENV } from './config/env.validation';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const config = app.get(ConfigService);
+  const port = config.get<number>('PORT') || 8080;
+  const nodeEnv = config.get<string>('NODE_ENV');
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -18,14 +23,14 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.use(cookieParser());
   app.useLogger([
-    Configaration.nodeEnv === NODE_ENV.DEVELOPMENT ? 'error' : 'log',
+    nodeEnv === NODE_ENV.DEVELOPMENT ? 'error' : 'log',
     'debug',
     'error',
     'warn',
     'verbose',
   ]);
 
-  await app.listen(Configaration.port);
+  await app.listen(port);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap().catch((err) => console.log(err));

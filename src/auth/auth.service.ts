@@ -3,6 +3,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
@@ -19,6 +20,7 @@ export class AuthService {
   constructor(
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
     private JWTService: JwtService,
+    private config: ConfigService,
   ) {}
 
   async register(
@@ -99,7 +101,7 @@ export class AuthService {
       role: user.role,
     };
     return this.JWTService.signAsync(payload, {
-      secret: Configaration.jwtSecret,
+      secret: this.config.get('JWT_SECRET'),
       expiresIn: '30m',
     });
   }
@@ -111,7 +113,7 @@ export class AuthService {
       sub: user.id,
     };
     return this.JWTService.signAsync(payload, {
-      secret: Configaration.jwtSecret,
+      secret: this.config.get('JWT_REFRESH_SECRET'),
       expiresIn: '7d',
     });
   }
