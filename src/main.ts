@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { LoggingInterceptor } from './common/interceptor/logging.interceptor';
 import { NODE_ENV } from './config/env.validation';
@@ -12,6 +13,9 @@ async function bootstrap() {
   const config = app.get(ConfigService);
   const port = config.get<number>('PORT') || 8080;
   const nodeEnv = config.get<string>('NODE_ENV');
+  const corsOrigin =
+    config.get<string>('CORS_ORIGIN') ?? 'http://localhost:3000';
+  const origins = corsOrigin.split(',').map((origin) => origin.trim());
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -24,6 +28,11 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.useGlobalInterceptors(new LoggingInterceptor());
   app.use(cookieParser());
+  app.enableCors({
+    origin: origins,
+    credentials: true,
+  });
+  app.use(helmet());
   app.useLogger([
     nodeEnv === NODE_ENV.DEVELOPMENT ? 'error' : 'log',
     'debug',
