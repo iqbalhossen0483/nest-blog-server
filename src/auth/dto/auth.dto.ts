@@ -1,11 +1,13 @@
 import {
   IsEmail,
+  IsEnum,
   IsNotEmpty,
   IsString,
   MaxLength,
   MinLength,
   Validate,
 } from 'class-validator';
+import { UserRole } from 'src/entities/user.entity';
 
 export class RegisterDto {
   @IsNotEmpty({ message: 'Name is required' })
@@ -54,4 +56,10 @@ export class LoginDto {
     },
   )
   password: string;
+}
+
+export class MakeAdminDto {
+  @IsNotEmpty({ message: 'Role is required' })
+  @IsEnum(UserRole, { message: 'Role must be a valid UserRole' })
+  role: UserRole;
 }

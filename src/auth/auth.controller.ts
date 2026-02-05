@@ -16,7 +16,7 @@ import { AuthGuard } from '../common/guard/auth.guard';
 import { UserEntity, UserRole } from '../entities/user.entity';
 import type { AuthenticatedRequest, ResponseType } from '../type/common.type';
 import { AuthService } from './auth.service';
-import { LoginDto, RegisterDto } from './dto/auth.dto';
+import { LoginDto, MakeAdminDto, RegisterDto } from './dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -66,7 +66,8 @@ export class AuthController {
   @Post('make-admin/:userId')
   async makeAdmin(
     @Param('userId', ParseIntPipe) userId: number,
+    @Body() payload: MakeAdminDto,
   ): Promise<ResponseType<Omit<UserEntity, 'password'>>> {
-    return this.authService.makeAdmin(userId);
+    return this.authService.makeAdmin(userId, payload);
   }
 }

@@ -9,9 +9,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
 import { Repository } from 'typeorm';
-import { UserEntity, UserRole } from '../entities/user.entity';
+import { UserEntity } from '../entities/user.entity';
 import { JWTPayload, ResponseType } from '../type/common.type';
-import { LoginDto, RegisterDto } from './dto/auth.dto';
+import { LoginDto, MakeAdminDto, RegisterDto } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -182,12 +182,13 @@ export class AuthService {
 
   async makeAdmin(
     userId: number,
+    payload: MakeAdminDto,
   ): Promise<ResponseType<Omit<UserEntity, 'password'>>> {
     const user = await this.userRepo.findOne({ where: { id: userId } });
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
-    user.role = UserRole.ADMIN;
+    user.role = payload.role;
     await this.userRepo.save(user);
 
     const findUpdatedUser = await this.userRepo.findOne({
