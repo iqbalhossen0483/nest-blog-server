@@ -9,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
 import { Repository } from 'typeorm';
-import { UserEntity } from '../entities/user.entity';
+import { UserEntity, UserRole } from '../entities/user.entity';
 import { JWTPayload, ResponseType } from '../type/common.type';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
 
@@ -177,6 +177,27 @@ export class AuthService {
       success: true,
       message: 'User profile fetched successfully',
       data: user,
+    };
+  }
+
+  async makeAdmin(
+    userId: number,
+  ): Promise<ResponseType<Omit<UserEntity, 'password'>>> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    user.role = UserRole.ADMIN;
+    await this.userRepo.save(user);
+
+    const findUpdatedUser = await this.userRepo.findOne({
+      where: { id: userId },
+    });
+    const { password: _password, ...rest } = findUpdatedUser!;
+    return {
+      success: true,
+      message: 'User promoted to admin successfully',
+      data: rest,
     };
   }
 }
