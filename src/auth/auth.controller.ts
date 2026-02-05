@@ -38,8 +38,8 @@ export class AuthController {
   @Get('profile')
   userProfile(
     @Request() req: AuthenticatedRequest,
-  ): Promise<Omit<UserEntity, 'password'>> {
-    return this.authService.getUserById(req.user.sub);
+  ): Promise<ResponseType<Omit<UserEntity, 'password'>>> {
+    return this.authService.getUserProfile(req.user.sub);
   }
 
   @UseGuards(AuthGuard)

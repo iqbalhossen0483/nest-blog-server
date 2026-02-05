@@ -170,4 +170,13 @@ export class AuthService {
       data: null,
     };
   }
+
+  async getUserProfile(userId: number) {
+    const user = await this.getUserById(userId);
+    return {
+      success: true,
+      message: 'User profile fetched successfully',
+      data: user,
+    };
+  }
 }
