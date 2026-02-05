@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
+import { LoggingInterceptor } from './common/interceptor/logging.interceptor';
 import { NODE_ENV } from './config/env.validation';
 
 async function bootstrap() {
@@ -21,6 +22,7 @@ async function bootstrap() {
   );
 
   app.setGlobalPrefix('api');
+  app.useGlobalInterceptors(new LoggingInterceptor());
   app.use(cookieParser());
   app.useLogger([
     nodeEnv === NODE_ENV.DEVELOPMENT ? 'error' : 'log',
