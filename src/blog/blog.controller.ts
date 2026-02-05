@@ -10,7 +10,12 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
+import { Role } from 'src/common/decorator/role.decorator';
+import { AuthGuard } from 'src/common/guard/auth.guard';
+import { RoleGuard } from 'src/common/guard/role.guard';
+import { UserRole } from 'src/entities/user.entity';
 import { BlogEntity } from '../entities/blog.entity';
 import type { ResponseType } from '../type/common.type';
 import { BlogService } from './blog.service';
@@ -38,12 +43,16 @@ export class BlogController {
     return this.blogService.getSingleBlog(id, query.page, query.limit);
   }
 
+  @UseGuards(AuthGuard, RoleGuard)
+  @Role(UserRole.ADMIN, UserRole.EDITOR)
   @Post('/create')
   @HttpCode(HttpStatus.CREATED)
   createBlog(@Body() blog: blogDto): Promise<ResponseType<BlogEntity>> {
     return this.blogService.createBlog(blog);
   }
 
+  @UseGuards(AuthGuard, RoleGuard)
+  @Role(UserRole.ADMIN, UserRole.EDITOR)
   @Post('/create-multiple')
   @HttpCode(HttpStatus.CREATED)
   createMultipleBlogs(
@@ -52,6 +61,8 @@ export class BlogController {
     return this.blogService.createMultipleBlogs(blogs);
   }
 
+  @UseGuards(AuthGuard, RoleGuard)
+  @Role(UserRole.ADMIN, UserRole.EDITOR)
   @Put('/update/:id')
   updateBlog(
     @Param('id', ParseIntPipe) id: number,
@@ -60,6 +71,8 @@ export class BlogController {
     return this.blogService.updateBlog(id, blog);
   }
 
+  @UseGuards(AuthGuard, RoleGuard)
+  @Role(UserRole.ADMIN, UserRole.EDITOR)
   @Delete('/delete/:id')
   deleteBlog(
     @Param('id', ParseIntPipe) id: number,
@@ -67,6 +80,8 @@ export class BlogController {
     return this.blogService.deleteBlog(id);
   }
 
+  @UseGuards(AuthGuard, RoleGuard)
+  @Role(UserRole.ADMIN, UserRole.EDITOR)
   @Post('/restore/:id')
   restoreBlog(
     @Param('id', ParseIntPipe) id: number,
@@ -74,6 +89,8 @@ export class BlogController {
     return this.blogService.restoreBlog(id);
   }
 
+  @UseGuards(AuthGuard)
+  @Role(UserRole.ADMIN, UserRole.EDITOR)
   @Post('/like/:id')
   likeBlog(
     @Param('id', ParseIntPipe) id: number,
@@ -82,6 +99,8 @@ export class BlogController {
     return this.blogService.likeBlog(id, payload.userId);
   }
 
+  @UseGuards(AuthGuard)
+  @Role(UserRole.ADMIN, UserRole.EDITOR)
   @Post('/dislike/:id')
   dislikeBlog(
     @Param('id', ParseIntPipe) id: number,
@@ -90,6 +109,7 @@ export class BlogController {
     return this.blogService.dislikeBlog(id, payload.userId);
   }
 
+  @UseGuards(AuthGuard)
   @Post('/views/:id')
   blogViews(
     @Param('id', ParseIntPipe) id: number,
