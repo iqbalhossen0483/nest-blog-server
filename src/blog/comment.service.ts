@@ -5,10 +5,10 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserEntity } from '../auth/entity/user.entity';
+import { BlogEntity, CommentEntity } from '../entities/blog.entity';
+import { UserEntity } from '../entities/user.entity';
 import { ResponseType } from '../type/common.type';
 import { commentDto } from './dto/blog.dto';
-import { BlogEntity, CommentEntity } from './entity/blog.entity';
 
 @Injectable()
 export class CommentService {

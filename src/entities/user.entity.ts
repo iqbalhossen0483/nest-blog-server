@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { BlogEntity, CommentEntity } from '../../blog/entity/blog.entity';
+import { BlogEntity, CommentEntity } from './blog.entity';
 
 export enum UserRole {
   USER = 'user',

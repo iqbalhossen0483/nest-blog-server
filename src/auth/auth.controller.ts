@@ -8,11 +8,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import type { Response } from 'express';
+import { AuthGuard } from '../common/guard/auth.guard';
+import { UserEntity } from '../entities/user.entity';
 import type { ResponseType } from '../type/common.type';
-import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
-import { UserEntity } from './entity/user.entity';
 import type { AuthenticatedRequest } from './interface/auth.interface.ts';
 
 @Controller('auth')

@@ -11,6 +11,7 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+import { BlogEntity } from '../entities/blog.entity';
 import type { ResponseType } from '../type/common.type';
 import { BlogService } from './blog.service';
 import {
@@ -19,7 +20,6 @@ import {
   LikeDislikeBlogDto,
   updateBlogDto,
 } from './dto/blog.dto';
-import { BlogEntity } from './entity/blog.entity';
 
 @Controller('blog')
 export class BlogController {

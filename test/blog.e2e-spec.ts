@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { BlogEntity } from 'src/blog/entity/blog.entity';
+import { BlogEntity } from 'src/entities/blog.entity';
 import { ResponseType } from 'src/type/common.type';
 import request from 'supertest';
 import { App } from 'supertest/types';

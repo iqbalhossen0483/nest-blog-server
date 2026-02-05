@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Param, Post, Put } from '@nestjs/common';
+import { CommentEntity } from '../entities/blog.entity';
 import { ResponseType } from '../type/common.type';
 import { CommentService } from './comment.service';
 import { commentDto, LikeDislikeBlogDto } from './dto/blog.dto';
-import { CommentEntity } from './entity/blog.entity';
 
 @Controller('blog/comment')
 export class CommentController {

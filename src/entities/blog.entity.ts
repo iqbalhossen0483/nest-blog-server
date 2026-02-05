@@ -11,7 +11,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { UserEntity } from '../../auth/entity/user.entity';
+import { UserEntity } from './user.entity';
 
 @Entity('blogs')
 export class BlogEntity {

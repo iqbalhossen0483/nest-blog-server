@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from '../auth/entity/user.entity';
+import { BlogEntity, CommentEntity } from '../entities/blog.entity';
+import { UserEntity } from '../entities/user.entity';
 import { BlogController } from './blog.controller';
 import { BlogService } from './blog.service';
 import { CommentController } from './comment.controller';
 import { CommentService } from './comment.service';
-import { BlogEntity, CommentEntity } from './entity/blog.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([BlogEntity, CommentEntity, UserEntity])],
